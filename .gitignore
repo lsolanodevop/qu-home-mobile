@@ -1,0 +1,21 @@
+# Maven
+target/
+
+# APK binary (download from the release page - not committed)
+apps/*.apk
+
+# Local helper files (not part of the deliverable)
+run-tests.ps1
+INSTRUCCIONES_DE_PRUEBA.txt
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.project
+.classpath
+.settings/
+
+# OS
+.DS_Store
+Thumbs.db
