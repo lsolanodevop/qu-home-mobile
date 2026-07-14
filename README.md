@@ -1,147 +1,144 @@
-+++++# **Mobile App Automation Test**
+# Art Gallery — Mobile Test Automation
 
-1. Download app-home-test-mobile.apk from here:
-👉 **[Go to Release Page to Download](https://github.com/automationapptest/home-test-mobile/releases/tag/v1.0.0)**
+Automated end‑to‑end tests for the **Art Gallery** Android app
+(`com.learnautomationapp`). The suite is written as a Behaviour‑Driven
+Development (BDD) project: every business rule is described in plain English
+inside Gherkin `.feature` files and executed with Cucumber, driving the real app
+through Appium and the UiAutomator2 driver.
 
-2. ⚠️ **Important Setup Requirement:** You **must** download this APK to your local machine. Configure your Appium capabilities to point to your local file path (e.g., `app: "./app-home-test-mobile.apk"`). Do not point the Appium server directly to the GitHub remote URL.
+## What this project covers
 
-3. Create in your personal github a public repository (name it for instance home-test-mobile).
+Four scenarios are automated end‑to‑end against the running app:
 
-4. Code requested exercises, commit and push your code and send the repository link according to the instructions given by the recruiter who contacted you.
+| # | Scenario | What it checks | Tag |
+|---|----------|----------------|-----|
+| 1 | Login (happy path) | A valid user logs in and lands on the catalog. | `@scenario1` |
+| 2 | Input validation | Empty or invalid credentials are rejected and access is blocked. | `@scenario2` |
+| 3 | Catalog exploration | Scrolls the feed to a piece deep in the list ("Twilight Glow"), opens it and verifies its detail screen. | `@scenario3` |
+| 4 | Registration (bonus) | Completes the multi‑step sign‑up, including the native date picker, and reaches the success screen. | `@scenario4` |
 
-5. Forking this repository is forbidden.
+Scenario 2 is written as a `Scenario Outline`, so it runs the same flow across
+several combinations of missing/invalid input — eight test cases in total.
 
-### General requisites for submission
+## Tech stack
 
- a. **Programming languages**
-    - Java
-    - Kotlin
+| Concern | Choice |
+|---------|--------|
+| Language | Java 17 |
+| Build | Maven |
+| Automation | Appium (`java-client` 10) with the UiAutomator2 driver |
+| BDD | Cucumber 7 (`cucumber-java` + JUnit) |
+| Design | Page Object Model, one Appium driver per test thread |
 
- b. **Drivers**
-    - Appium
+## Project structure
 
- c. **Platforms**
-    - Android.
-
-### General test requisites
-- All tests should run successfully either from IDE or command line.
-- Instructions to build and run the code and tests submitted must be provided.
-- The app login dummy email is johndoe@email.com and the password is 123.
-- A small video of one of the scenarios running end to end can be added/requested (optional)
-  
-### 🎯 Scenario-Based Challenge
-
-You are required to automate the following core business requirements. The architectural design, framework structure, locator strategies, and implementation details are entirely up to your professional judgment. 
-
-#### Scenario 1 - User Authentication (Happy Path)
-* **Goal:** Verify successful user login.
-* **Business Requirement:** Log into the application using a valid user profile. Assert that the application successfully authenticates the credentials and seamlessly transitions the user to the main Art Gallery catalog view.
-* *(Note: You may use these credentials for this scenario,  `johndoe@email.com` / `123`)*
-
-#### Scenario 2 - Input Validation (Error Handling)
-* **Goal:** Verify application security and user feedback.
-* **Business Requirement:** Attempt to log into the application using missing inputs (empty fields) or invalid credentials. Assert that the application properly blocks access and displays the corresponding error popup or native validation alert to the user.
-
-#### Scenario 3 - Catalog Exploration (Native Interaction)
-* **Goal:** Verify feed browsing and content consistency.
-* **Business Requirement:** From the main Art Gallery feed, navigate down the scrollable list of items to locate a specific art piece situated deep in the catalog (e.g., "Twilight Glow"). Select the item or verify its presence and details on the screen.
-
----
-
-### 🎁 Bonus Challenge (Optional)
-
-If you wish to showcase advanced framework capabilities or mobile engineering experience, implement the following scenario:
-
-#### Scenario 4 - User Registration Flow
-* **Goal:** Verify the account creation path.
-* **Business Requirement:** Navigate to the registration screen from the login view. Complete the sign-up form fields—including interacting with the selection components—and verify that the user can successfully reach the registration success screen.
-
-
-
-<img width="209" height="438" alt="image" src="https://github.com/user-attachments/assets/65f972c7-4914-4d7b-b276-b3cf682e9da0" />
-<img width="220" height="465" alt="image" src="https://github.com/user-attachments/assets/63388620-fdbf-4bb5-9908-ce7355f69dd4" />
-
----
-
-## 🥒 Implementation — Appium + Cucumber (BDD / Gherkin)
-
-This repository implements the four scenarios above as a **Behaviour-Driven
-Development** suite: business rules are written in plain-language **Gherkin**
-`.feature` files and executed with **Cucumber**, driving the Android app through
-**Appium** (UiAutomator2) using **Java** and a **Page Object Model**.
-
-### Tech stack
-| Concern            | Choice                                  |
-|--------------------|-----------------------------------------|
-| Language           | Java 17                                 |
-| Build              | Maven                                   |
-| Driver             | Appium `java-client` 10.x (UiAutomator2)|
-| BDD                | Cucumber 7 (`cucumber-java` + JUnit)    |
-| Design pattern     | Page Object Model + ThreadLocal driver  |
-
-### Project layout
 ```
-home-test-mobile/
-├─ pom.xml
-├─ apps/                                  # put app-home-test-mobile.apk here
+qu-home-mobile/
+├─ pom.xml                     # Maven build and dependencies
+├─ run-tests.ps1              # Windows helper: sets everything up and runs the suite
+├─ apps/                       # the .apk lives here (not committed)
+├─ docs/                       # demo video
 └─ src/test/
    ├─ java/com/homtest/
-   │  ├─ pages/     BasePage, LoginPage, GalleryPage, RegistrationPage
-   │  ├─ steps/     Hooks + LoginSteps, GallerySteps, RegistrationSteps
-   │  ├─ support/   ConfigReader, DriverManager
-   │  └─ runners/   TestRunner, DryRunTestRunner
+   │  ├─ support/              # infrastructure
+   │  │   ├─ ConfigReader      # reads config.properties, overridable from the CLI
+   │  │   └─ DriverManager     # creates/holds the AndroidDriver
+   │  ├─ pages/                # Page Objects (one class per screen)
+   │  │   ├─ BasePage          # shared waits, typing, tapping, scrolling
+   │  │   ├─ LoginPage
+   │  │   ├─ GalleryPage       # catalog + item detail screen
+   │  │   └─ RegistrationPage
+   │  ├─ steps/                # glue between Gherkin and the Page Objects
+   │  │   ├─ Hooks             # starts the driver, screenshots on failure
+   │  │   ├─ LoginSteps
+   │  │   ├─ GallerySteps
+   │  │   └─ RegistrationSteps
+   │  └─ runners/
+   │      ├─ TestRunner        # runs the whole suite (real device)
+   │      └─ DryRunTestRunner  # validates steps without a device
    └─ resources/
-      ├─ config.properties
-      └─ features/  login.feature, gallery.feature, registration.feature
+      ├─ config.properties     # Appium URL, device, APK path, credentials
+      └─ features/             # the Gherkin scenarios
+          ├─ login.feature
+          ├─ gallery.feature
+          └─ registration.feature
 ```
 
-### Scenario → Feature mapping
-| Challenge scenario                | Feature file            | Tag         |
-|-----------------------------------|-------------------------|-------------|
-| 1 — Authentication (happy path)   | `login.feature`         | `@scenario1`|
-| 2 — Input validation (errors)     | `login.feature`         | `@scenario2`|
-| 3 — Catalog exploration (scroll)  | `gallery.feature`       | `@scenario3`|
-| 4 — Registration flow (bonus)     | `registration.feature`  | `@scenario4`|
+The idea is a clean separation of layers: the `.feature` files describe *what*
+the app should do, the step definitions translate each sentence into actions,
+the Page Objects know *how* to interact with each screen, and the `support`
+classes handle the Appium driver and configuration. If a locator ever changes,
+you only touch the relevant Page Object.
 
-### Prerequisites
+## Getting the things you need
+
+- **The app (APK).** It is intentionally not committed to the repo. The
+  `run-tests.ps1` script downloads it automatically into `apps/`. If you prefer
+  to grab it by hand, download `app-home-test-mobile.apk` from the challenge
+  release page and drop it in `apps/app-home-test-mobile.apk`.
+- **Test credentials.** `johndoe@email.com` / `123` (already wired into
+  `config.properties`).
+- **An Android emulator or device.** Create one from Android Studio → Device
+  Manager, and confirm it is connected with `adb devices`.
+
+## Prerequisites
+
 - JDK 17 and Maven
-- Android SDK with `ANDROID_HOME` set, plus an emulator or device (`adb devices`)
-- Node LTS (20/22) + Appium 2 with the UiAutomator2 driver
+- Android SDK, with `ANDROID_HOME` pointing to it (the UiAutomator2 driver needs
+  this to reach `adb`)
+- Node LTS (20 or 22) and Appium 2 with the UiAutomator2 driver:
+  ```bash
+  npm install -g appium@2
+  appium driver install uiautomator2@3
+  ```
+  Note: use a Node LTS version — Node 21 is not compatible with Appium and fails
+  to start.
 
-### How to run
-On Windows, `run-tests.ps1` prepares everything (downloads the APK, checks the
-JDK/`ANDROID_HOME`, starts Appium and runs the suite):
+## How to run
+
+On Windows, `run-tests.ps1` does the whole setup for you — it downloads the APK
+if missing, checks the JDK and `ANDROID_HOME`, starts Appium if it isn't
+running, and executes the suite:
+
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\run-tests.ps1
-.\run-tests.ps1 -Tags "@scenario3"   # a single scenario
-.\run-tests.ps1 -DryRun              # validate without a device
+.\run-tests.ps1 -Tags "@scenario3"   # run a single scenario
+.\run-tests.ps1 -DryRun              # validate without an emulator
 ```
 
-Or manually:
+Or run it manually:
+
 ```bash
-# 1. Start Appium and boot an Android emulator/device
+# 1. Start Appium and boot an emulator/device
 appium
 
 # 2. Run the whole suite
 mvn clean test
 
-# Run a single scenario by tag
-mvn test -Dcucumber.filter.tags="@scenario3"
+# Run one scenario by tag
+mvn test -Dcucumber.filter.tags="@scenario1"
 
-# Validate features/steps without a device (no emulator needed)
+# Validate the features/steps without a device (no emulator needed)
 mvn test -Dtest=DryRunTestRunner
 ```
-HTML report is generated at `target/cucumber-reports/report.html`. Full
-step-by-step notes are in `INSTRUCCIONES_DE_PRUEBA.txt`.
 
-> The APK is not committed — `run-tests.ps1` downloads it automatically to
-> `apps/`. For a manual `mvn` run, place `app-home-test-mobile.apk` in `apps/`.
+A full Spanish walkthrough (prerequisites, troubleshooting, tag combinations) is
+in `INSTRUCCIONES_DE_PRUEBA.txt`.
 
-### Demo video
-A short end-to-end recording of the registration flow (Scenario 4) is available
-at [`docs/scenario4-registration-demo.mp4`](docs/scenario4-registration-demo.mp4).
+## Reports and evidence
 
-Element locators live centrally inside each Page Object
-(`src/test/java/com/homtest/pages`) and are matched by accessibility-id, so they
-are easy to maintain if the app changes.
+- After a run, an HTML report is generated at
+  `target/cucumber-reports/report.html` (a JSON report is produced too).
+- If a scenario fails, a screenshot is automatically attached to the report.
+- A short end‑to‑end recording of the registration flow is at
+  [`docs/scenario4-registration-demo.mp4`](docs/scenario4-registration-demo.mp4).
 
+## A few implementation notes
+
+- Locators are centralised inside each Page Object and matched by
+  accessibility‑id, so they are easy to maintain.
+- The app is built with React Native and re‑renders often, which can make
+  elements go stale mid‑interaction. `BasePage` handles this with explicit waits
+  that ignore stale‑element churn and retry, which keeps the suite stable.
+- A lightweight GitHub Actions workflow (`.github/workflows/ci.yml`) compiles
+  the project and validates that every Gherkin step is defined on each push.
