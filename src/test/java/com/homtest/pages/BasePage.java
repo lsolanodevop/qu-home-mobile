@@ -69,6 +69,17 @@ public abstract class BasePage {
         }
     }
 
+    protected boolean waitForPresent(By locator, int seconds) {
+        try {
+            new WebDriverWait(driver, Duration.ofSeconds(seconds))
+                    .ignoring(StaleElementReferenceException.class)
+                    .until(ExpectedConditions.presenceOfElementLocated(locator));
+            return true;
+        } catch (org.openqa.selenium.TimeoutException e) {
+            return false;
+        }
+    }
+
     protected String textOf(By locator) {
         return waitVisible(locator).getText();
     }

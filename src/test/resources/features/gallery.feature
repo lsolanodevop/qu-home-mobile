@@ -12,3 +12,5 @@ Feature: Catalog Exploration
   Scenario: Locate an art piece deep in the scrollable catalog
     When I scroll the catalog to the art piece "Twilight Glow"
     Then the art piece "Twilight Glow" should be visible
+    When I open the art piece "Twilight Glow"
+    Then its details should be displayed for "Twilight Glow"

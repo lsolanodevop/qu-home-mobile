@@ -21,4 +21,15 @@ public class GallerySteps {
         assertTrue("Art piece '" + itemName + "' is not visible on screen",
                 galleryPage.isItemVisible(itemName));
     }
+
+    @When("I open the art piece {string}")
+    public void i_open_the_art_piece(String itemName) {
+        galleryPage.openItem(itemName);
+    }
+
+    @Then("its details should be displayed for {string}")
+    public void its_details_should_be_displayed_for(String itemName) {
+        assertTrue("Item detail screen was not shown for '" + itemName + "'",
+                galleryPage.areDetailsVisible(itemName));
+    }
 }
