@@ -1,0 +1,112 @@
+Instrucciones para ejecutar las pruebas
+=======================================
+
+Automatizacion móvil (Android) de la app Art Gallery con Appium + Cucumber (BDD),
+Java y Page Object Model. La suite cubre los cuatro escenarios del reto:
+
+  @scenario1  Login exitoso (happy path)
+  @scenario2  Validacion de credenciales / acceso bloqueado
+  @scenario3  Exploracion del catalogo (scroll hasta un item)
+  @scenario4  Registro de usuario (bonus)
+
+
+Requisitos
+----------
+
+- JDK 17 o superior            (java -version)
+- Maven 3.9+                   (mvn -version)
+- Android SDK con un emulador o dispositivo    (adb devices)
+- Node.js LTS (20 o 22) + Appium 2 con el driver UiAutomator2
+
+  Nota: usa Node LTS. Con Node 21 Appium falla al arrancar (ERR_REQUIRE_ESM).
+  Instalacion de Appium:
+      npm install -g appium@2
+      appium driver install uiautomator2@3
+
+- Variable ANDROID_HOME apuntando al SDK, por ejemplo:
+      C:\Users\<usuario>\AppData\Local\Android\Sdk
+  Para fijarla de forma permanente (una vez):
+      [Environment]::SetEnvironmentVariable("ANDROID_HOME",
+        "C:\Users\<usuario>\AppData\Local\Android\Sdk", "User")
+
+
+Opcion rapida (Windows)
+-----------------------
+
+El script run-tests.ps1 deja todo listo: descarga el APK si no existe, verifica
+el JDK y ANDROID_HOME, levanta Appium si hace falta y ejecuta la suite.
+
+    powershell -ExecutionPolicy Bypass -File .\run-tests.ps1
+
+    .\run-tests.ps1 -Tags "@scenario3"   # un escenario concreto
+    .\run-tests.ps1 -DryRun              # solo valida, sin emulador ni APK
+
+(El APK no se versiona: el script lo descarga automaticamente a apps/. Si
+prefieres bajarlo a mano, esta en la release del reto y va en
+apps/app-home-test-mobile.apk.)
+
+
+Ejecucion manual
+----------------
+
+1. Arranca un emulador (Android Studio > Device Manager) y confirma con:
+       adb devices
+
+2. En otra terminal, levanta Appium:
+       appium
+
+3. Ejecuta la suite completa:
+       mvn clean test
+
+   O un escenario por tag:
+       mvn test -Dcucumber.filter.tags="@scenario1"
+       mvn test -Dcucumber.filter.tags="@scenario2"
+       mvn test -Dcucumber.filter.tags="@scenario3"
+       mvn test -Dcucumber.filter.tags="@scenario4"
+
+
+Validacion sin dispositivo
+--------------------------
+
+Para comprobar que compila y que cada paso Gherkin tiene su definicion, sin
+necesidad de emulador ni Appium:
+
+    mvn test -Dtest=DryRunTestRunner
+
+Esperado: BUILD SUCCESS con "Tests run: 8, Failures: 0, Errors: 0".
+
+
+Reportes
+--------
+
+Tras la ejecucion se generan en target/cucumber-reports/:
+    report.html   (reporte navegable)
+    report.json
+
+Si un escenario falla, se adjunta una captura de pantalla al reporte.
+
+
+Desde el IDE
+------------
+
+Importar como proyecto Maven, usar SDK Java 17 y ejecutar la clase
+com.homtest.runners.TestRunner (o un .feature con el plugin de Cucumber).
+Requiere Appium y un emulador/dispositivo activos.
+
+
+Problemas frecuentes
+--------------------
+
+- "Could not start a new session": revisa que Appium este corriendo y que la
+  URL de config.properties coincida (por defecto http://127.0.0.1:4723).
+
+- "adb devices" vacio: arranca un emulador o conecta un telefono con depuracion
+  USB.
+
+- ERR_REQUIRE_ESM al arrancar Appium: estas en Node 21; cambia a Node LTS.
+
+- "Neither ANDROID_HOME nor ANDROID_SDK_ROOT ... exported": falta ANDROID_HOME;
+  fijala y reinicia la terminal.
+
+
+Credenciales de prueba: johndoe@email.com / 123

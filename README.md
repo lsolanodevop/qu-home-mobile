@@ -106,10 +106,18 @@ home-test-mobile/
 ### Prerequisites
 - JDK 17 and Maven
 - Android SDK with `ANDROID_HOME` set, plus an emulator or device (`adb devices`)
-- Appium 2 with the UiAutomator2 driver (`appium driver install uiautomator2`)
-- The `app-home-test-mobile.apk` placed in `./apps/`
+- Node LTS (20/22) + Appium 2 with the UiAutomator2 driver
 
 ### How to run
+On Windows, `run-tests.ps1` prepares everything (downloads the APK, checks the
+JDK/`ANDROID_HOME`, starts Appium and runs the suite):
+```powershell
+powershell -ExecutionPolicy Bypass -File .\run-tests.ps1
+.\run-tests.ps1 -Tags "@scenario3"   # a single scenario
+.\run-tests.ps1 -DryRun              # validate without a device
+```
+
+Or manually:
 ```bash
 # 1. Start Appium and boot an Android emulator/device
 appium
@@ -123,7 +131,11 @@ mvn test -Dcucumber.filter.tags="@scenario3"
 # Validate features/steps without a device (no emulator needed)
 mvn test -Dtest=DryRunTestRunner
 ```
-HTML report is generated at `target/cucumber-reports/report.html`.
+HTML report is generated at `target/cucumber-reports/report.html`. Full
+step-by-step notes are in `INSTRUCCIONES_DE_PRUEBA.txt`.
+
+> The APK is not committed — `run-tests.ps1` downloads it automatically to
+> `apps/`. For a manual `mvn` run, place `app-home-test-mobile.apk` in `apps/`.
 
 ### Demo video
 A short end-to-end recording of the registration flow (Scenario 4) is available
